@@ -73,17 +73,13 @@ public class MyDeque<E>{
   }
 
   public E getFirst(){
-    if (data[start] != null) return data[start];
+    return data[start];
   }
 
   public E getLast(){
-    if (data[end] != null) return data[end];
+    return data[end];
   }
 
-  public static void main(String[] args) {
-    MyDeque<Integer> m = new MyDeque<Integer>();
-    System.out.println(m);
-  }
 
 
 
