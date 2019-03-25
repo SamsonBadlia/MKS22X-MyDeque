@@ -2,18 +2,18 @@ import java.util.*;
 
 public class MyDeque<E>{
   private E[] data;
-  private int size, start, end;
+  private int size;
+  private int start = 0;
+  private int end = 0;
 
   @SuppressWarnings("unchecked")
   public MyDeque(){
-    data = (E[])new Object[10];
-    start = 0; end = 0;
+    data = (E[]) new Object[10];
   }
 
   @SuppressWarnings("unchecked")
   public MyDeque(int initialCapacity){
-    data = (E[])new Object[initialCapacity];
-    start = 0; end = 0;
+    data = (E[]) new Object[initialCapacity];
   }
 
   public int size(){
@@ -21,121 +21,112 @@ public class MyDeque<E>{
   }
 
   @SuppressWarnings("unchecked")
-  public void resize() {
-      Object[] newArr = new Object[data.length * 2 + 1];
-      int newArrIndex = 0;
-      if (start >= end - 1) {
-          for (int i = data.length - 1; i >= start + 1; i--) {
-              newArr[newArrIndex] = data[i];
-              newArrIndex++;
-          }
-          for (int i = 0; i < end; i++) {
-              newArr[newArrIndex] = data[i];
-              newArrIndex++;
-          }
-      } else {
-          for (int i = start; i < end; i++) {
-              newArr[newArrIndex] = data[i];
-              newArrIndex++;
-          }
+  private void resize(){
+    E[] newArr = data;
+    data = (E[]) new Object[data.length * 2 + 1];
+    int i = start, j = 0;
+
+    if(size !=0){
+      if (end >= start) {
+        while( i <= end ){
+          data[j] = newArr[i];
+          i++; j++;
+        }
       }
-      data = (E[]) newArr;
-      start = 0;
-      end = size;
+      else{
+        while(end >= i){
+          data[j] = newArr[i];
+          i++; j++;
+          if(i == data.length) i = 0;
+        }
+      }
+    }
+
   }
 
   public String toString(){
     String s = "{";
-    if (start < end){
-      for (int i = start; i < end; i++){
-        if (data[i] != null) s += data[i] + " ";
-      }
-    } else{
-      for (int i = end; i < start; i++){
-        if (data[i] != null) s += data[i] + " , ";
+
+    for(int i = start; i < data.length; i++){
+      if(data[i] != null){
+        s += data[i];
+        if(i != end) s += " ";
       }
     }
+
+    for(int i = 0; i < start; i++){
+      if(data[i] != null){
+        s += data[i];
+        if(i != end) s += " ";
+      }
+    }
+
     s += "}";
     return s;
   }
 
-  //has IndexOutOfBounds MUST FIX ASAP
-  public void addFirst(E element){
+  public void addFirst(E element) {
     if (element == null) throw new NullPointerException();
     if (size == data.length) resize();
+
+    if (end == 0 && start == 0) end++;
     if (start < 0) start = data.length - 1;
-    if (data[start] == null){
-      if (start == end) end++;
-      data[start] = element;
-      start++;
-      size++;
-    }
+
+    if (data[start] != null) start--;
+    data[start] = element;
+    start--;
+    size++;
   }
 
   public void addLast(E element){
     if (element == null) throw new NullPointerException();
     if (size == data.length) resize();
-    if (data[end] != null) end++;
+
+    if (end == 0 && start == 0) start--;
     if (end >= data.length) end = 0;
+
+    if (data[end] != null) end++;
     data[end] = element;
     end++;
     size++;
   }
 
   public E removeFirst(){
-    if (start <= 0 || start >= data.length) throw new NoSuchElementException();
-    E temp = data[start];
+    if (size == 0) throw new NoSuchElementException();
+
+    int index;
+    if (start + 1 >= data.length) index = 0;
+    else index = start + 1;
+
+    E temp = data[index];
     data[start] = null;
-    start--;
+    start = index;
+    size--;
     return temp;
   }
 
-  public E removeLast(){
-    if (end <= 0 || end >= data.length) throw new NoSuchElementException();
-    E temp = data[end];
-    end--;
-    data[end] = null;
+  public E removeLast() {
+    if (size == 0) throw new NoSuchElementException();
+
+    int index;
+    if (end - 1 < 0) index = data.length - 1;
+    else index = end - 1;
+
+    E temp = data[index];
+    data[index] = null;
+    end = index;
+    size--;
     return temp;
   }
 
   public E getFirst(){
-    if (start <= 0 || start >= data.length) throw new NoSuchElementException();
+    if (size == 0) throw new NoSuchElementException();
     return data[start];
   }
 
   public E getLast(){
-    if (end <= 0 || end >= data.length) throw new NoSuchElementException();
+    if (size == 0) throw new NoSuchElementException();
     return data[end];
   }
-
-  //System.out.println();
-  public static void main(String[] args) {
-    MyDeque<Integer> m = new MyDeque<Integer>();
-
-    System.out.println("Should be {} : ");
-    System.out.println(m);
-    System.out.println();
-    System.out.println();
-
-    System.out.println("Adding to end : ");
-    m.addLast(1);
-    System.out.println("{1} :");
-    System.out.println(m);
-    m.addLast(23);
-    System.out.println("{1,23} : ");
-    System.out.println(m);
-
-    System.out.println("Adding to start : ");
-    m.addFirst(5);
-    System.out.println("{5,1,23} : ");
-    System.out.println(m);
-    m.addFirst(9);
-    System.out.println("{9,5,1,23} : ");
-    System.out.println(m);
-
-
-  }
-
-
 
 }
