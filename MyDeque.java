@@ -24,43 +24,38 @@ public class MyDeque<E>{
   private void resize(){
     E[] newArr = data;
     data = (E[]) new Object[data.length * 2 + 1];
-    int i = start, j = 0;
-
-    if(size !=0){
-      if (end >= start) {
-        while( i <= end ){
-          data[j] = newArr[i];
-          i++; j++;
-        }
+    if (start > end){
+      for (int i = start; i < data.length; i++){
+        newArr[i] = data[i];
       }
-      else{
-        while(end >= i){
-          data[j] = newArr[i];
-          i++; j++;
-          if(i == data.length) i = 0;
-        }
+      for (int i = 0; i < end; i++){
+        newArr[i] = data[i];
+      }
+    } else {
+      for (int i = start; i < end; i++){
+        newArr[i] = data[i];
       }
     }
-
   }
 
   public String toString(){
     String s = "{";
-
-    for(int i = start; i < data.length; i++){
-      if(data[i] != null){
-        s += data[i];
-        if(i != end) s += " ";
+    if (start < end){
+      for (int i = start; i < end; i++){
+        if (i != end - 1) s += data[i] + " ";
+        else s += data[i];
       }
     }
-
-    for(int i = 0; i < start; i++){
-      if(data[i] != null){
-        s += data[i];
-        if(i != end) s += " ";
+    else{
+      for (int i = start; i < data.length; i++){
+        if (i != data.length - 1 && data[i] != null) s += data[i] + " ";
+        else if (data[i] != null) s += data[i];
+      }
+      for (int i = 0; i < end; i++){
+        if (i != data.length - 1&& data[i] != null) s += data[i] + " ";
+        else if (data[i] != null)   s += data[i];
       }
     }
-
     s += "}";
     return s;
   }
@@ -74,7 +69,7 @@ public class MyDeque<E>{
 
     if (data[start] != null) start--;
     data[start] = element;
-    start--;
+    start++;
     size++;
   }
 
@@ -82,7 +77,7 @@ public class MyDeque<E>{
     if (element == null) throw new NullPointerException();
     if (size == data.length) resize();
 
-    if (end == 0 && start == 0) start--;
+    if (end == 0 && start == 0) start++;
     if (end >= data.length) end = 0;
 
     if (data[end] != null) end++;
@@ -127,6 +122,13 @@ public class MyDeque<E>{
   public E getLast(){
     if (size == 0) throw new NoSuchElementException();
     return data[end];
+  }
+
+  public String debugString() {
+    String parts = "debug:\n";
+    parts += Arrays.toString(data);
+    parts += String.format("\nStart index: %d\nEnd index: %d", start, end);
+    return parts;
   }
 
 }
