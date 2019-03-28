@@ -1,134 +1,181 @@
 import java.util.*;
 
 public class MyDeque<E>{
+
   private E[] data;
-  private int size;
-  private int start = 0;
-  private int end = 0;
+  private int size, start, end;
 
   @SuppressWarnings("unchecked")
   public MyDeque(){
     data = (E[]) new Object[10];
+    end = 0; size = 10; start = 0;
   }
 
   @SuppressWarnings("unchecked")
-  public MyDeque(int initialCapacity){
-    data = (E[]) new Object[initialCapacity];
+  public MyDeque(int initialCapacity) {
+    E[] d = (E[]) new Object[initialCapacity];
+    data = d;
+    size = initialCapacity;
+    end = 0; start = 0;
   }
 
   public int size(){
-    return this.size;
-  }
-
-  @SuppressWarnings("unchecked")
-  private void resize(){
-    E[] newArr = data;
-    data = (E[]) new Object[data.length * 2 + 1];
-    if (start > end){
-      for (int i = start; i < data.length; i++){
-        newArr[i] = data[i];
-      }
-      for (int i = 0; i < end; i++){
-        newArr[i] = data[i];
-      }
-    } else {
-      for (int i = start; i < end; i++){
-        newArr[i] = data[i];
-      }
-    }
+    if (end >= start) return end - start;
+    else return (size - start) + end - 1;
   }
 
   public String toString(){
+    if (start == end){
+      return "{}";
+    }
+
     String s = "{";
-    if (start < end){
+
+    if (end < start){
+      for (int i = start; i < size; i++){
+        s += data[i] + " ";
+      }
+      for (int i=0; i < end; i++){
+        s += data[i] + " ";
+      }
+    }
+
+    else {
       for (int i = start; i < end; i++){
-        if (i != end - 1) s += data[i] + " ";
-        else s += data[i];
+        s += data[i] + " ";
       }
     }
-    else{
-      for (int i = start; i < data.length; i++){
-        if (i != data.length - 1 && data[i] != null) s += data[i] + " ";
-        else if (data[i] != null) s += data[i];
-      }
-      for (int i = 0; i < end; i++){
-        if (i != data.length - 1&& data[i] != null) s += data[i] + " ";
-        else if (data[i] != null)   s += data[i];
-      }
-    }
+
     s += "}";
     return s;
   }
 
-  public void addFirst(E element) {
-    if (element == null) throw new NullPointerException();
-    if (size == data.length) resize();
+  private void resize(){
+   @SuppressWarnings("unchecked")
+   E[] newArr = (E[])new Object[size * 2 + 1];
+   int idx = 0;
 
-    if (end == 0 && start == 0) end++;
-    if (start < 0) start = data.length - 1;
+   if (end <= start){
+     for (int i = start; i < size; i++){
+       newArr[idx] = data[i];
+       idx++;
+     }
+     for (int i = 0; i < end; i++){
+       newArr[idx] = data[i];
+       idx++;
+     }
+   }
 
-    if (data[start] != null) start--;
-    data[start] = element;
-    start++;
-    size++;
+   else {
+     for (int i = start; i < end; i++){
+       newArr[idx] = data[i];
+       idx++;
+     }
+   }
+
+   start = 0; end = size();
+   size = size * 2;
+   data = newArr;
+ }
+
+//adding Functions (add to front and end of stack/queue)
+
+  public void addFirst(E element){
+    nullCheck(element);
+
+    if (size() == 0){
+      end++;
+      data[end-1] = element;
+    }
+
+    else {
+      isFull();
+      if (start == 0){
+        for (int i = end; i >= 1; i--){
+          data[i] = data[i-1];
+        }
+        data[0] = null;
+        start++;
+        end++;
+      }
+      start--;
+      data[start] = element;
+    }
+
   }
 
   public void addLast(E element){
-    if (element == null) throw new NullPointerException();
-    if (size == data.length) resize();
+    nullCheck(element);
 
-    if (end == 0 && start == 0) start++;
-    if (end >= data.length) end = 0;
-
-    if (data[end] != null) end++;
-    data[end] = element;
-    end++;
-    size++;
+    if (size() == size) resize();
+    if (end == size){
+      data[0] = element;
+      end = 1;
+    }
+    else {
+      data[end] = element;
+      end++;
+    }
   }
+
+//removing Functions (remove and return the front or end of stack/queue)
 
   public E removeFirst(){
-    if (size == 0) throw new NoSuchElementException();
+    isEmpty();
 
-    int index;
-    if (start + 1 >= data.length) index = 0;
-    else index = start + 1;
-
-    E temp = data[index];
+    E temp = data[start];
     data[start] = null;
-    start = index;
-    size--;
+
+    if (start == end - 1){
+      start = 0;
+      end = 0;
+      return temp;
+    }
+
+    if (start < size - 1) start++;
+    else start = 0;
     return temp;
   }
 
-  public E removeLast() {
-    if (size == 0) throw new NoSuchElementException();
+  public E removeLast(){
+    isEmpty();
 
-    int index;
-    if (end - 1 < 0) index = data.length - 1;
-    else index = end - 1;
-
-    E temp = data[index];
-    data[index] = null;
-    end = index;
-    size--;
+    E temp = data[end - 1];
+    end--;
     return temp;
   }
+
+//get Functions (return the element at the front or end of the stack/queue)
 
   public E getFirst(){
-    if (size == 0) throw new NoSuchElementException();
+    elementException();
+
     return data[start];
   }
 
   public E getLast(){
-    if (size == 0) throw new NoSuchElementException();
-    return data[end];
+    elementException();
+
+    return data[end - 1];
   }
 
-  public String debugString() {
-    String parts = "debug:\n";
-    parts += Arrays.toString(data);
-    parts += String.format("\nStart index: %d\nEnd index: %d", start, end);
-    return parts;
+
+//helper methods to assist with resizing and errors
+
+  private void nullCheck(E element){
+    if (element == null) throw new NullPointerException();
+  }
+
+  private void isFull(){
+    if (end == size || end == start) resize();
+  }
+
+  private void isEmpty(){
+    if (size() == 0) throw new NoSuchElementException();
+  }
+
+  private void elementException(){
+    if (start == end) throw new NoSuchElementException();
   }
 
 }
