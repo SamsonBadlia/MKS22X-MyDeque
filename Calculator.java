@@ -4,45 +4,28 @@ public class Calculator{
 
   public static double eval(String s){
 
-      MyDeque<Double> m = new MyDeque<Double>(s.length());
-      File f = new File(s);
-      Scanner scan = new Scanner(f);
+      MyDeque<String> calculator = new MyDeque<String>();
+      Scanner scan = new Scanner(s);
       String operations = "+-?*%";
       double output;
       while (scan.hasNextLine()){
         String str = scan.next();
         if (operations.contains(str)){
-          if (str == "+") output = add(Double.parseDouble(m.removeLast()),Double.parseDouble(m.removeLast()));
-          if (str == "-") output = subtract(Double.parseDouble(m.removeLast()),Double.parseDouble(m.removeLast()));
-          if (str == "/") output = divide(Double.parseDouble(m.removeLast()),Double.parseDouble(m.removeLast()));
-          if (str == "*") output = multiply(Double.parseDouble(m.removeLast()),Double.parseDouble(m.removeLast()));
-          if (str == "%") output = mod(Double.parseDouble(m.removeLast()),Double.parseDouble(m.removeLast()));
+          output = performMath(Double.parseDouble(calculator.removeLast()), Double.parseDouble(calculator.removeLast()), str);
           str = output + "";
         }
-        m.addLast(str);
+        calculator.addLast(str);
       }
-
-
+      return Double.parseDouble(calculator.getLast());
   }
 
-  public static double add(double a, double b){
-   return a + b;
-  }
-
-  public static double subtract(double a, double b){
-    return a - b;
-  }
-
-  public static double multiply(double a , double b){
-    return a * b;
-  }
-
-  public static double divide(double a, double b){
-    return a / b;
-  }
-
-  public static double mod(double a, double b){
-    return a % b;
+  private static double performMath(double a, double b, String operation){
+    if(operation.equals("+")) return b + a;
+    else if(operation.equals("-")) return b - a;
+    else if(operation.equals("*")) return b * a;
+    else if(operation.equals("/")) return b / a;
+    else if(operation.equals("%")) return b % a;
+    return 0.0;
   }
 
 
